@@ -15,7 +15,7 @@ I bought a standing desk from Autonomous (Smart Desk 2 Home Office). After setti
 
 Opening up the controller reveals nicely labeled PINs.
 
-![IMG_20200304_195541](/home/stefan/Dokumente/Autonomous/IMG_20200304_195541.jpg)
+![IMG_20200304_195541](IMG_20200304_195541.jpg)
 
 Thus we now only know that UART is used to transfer data, but also which wire carries which signal:
 
