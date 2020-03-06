@@ -50,6 +50,8 @@ I did not dismantle the controller that shipped with my desk. Instead, I asked t
 
 I opened up the casing (standard screws) and found a nicely labeled PCB where I could attach the probes to. 
 
+You can find my captured data from the logic analyzer in the folder "logic_analyzer".
+
 ## Received Data
 
 When no button is pressed, we keep receiving (repeating):
