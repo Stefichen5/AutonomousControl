@@ -1,4 +1,4 @@
-# Autonomous Controller
+# Autonomous Standup Desk Controller
 
 **This writeup is still WIP**
 
@@ -9,7 +9,7 @@ I bought a standing desk from Autonomous (Smart Desk 2 Home Office). After setti
 ## ToDo
 
 - More detailed writeup
-- Test findings by implementing my own controller on a uC (probably ESP32)
+- Finish implementing protocol on ESP32 (possibly with wifi control in the future?)
 
 ## First impressions
 
@@ -58,7 +58,11 @@ When no button is pressed, we keep receiving (repeating):
 
 Base Message:
 
-0x98, 0x98, 0x00, 0x00, (2 more Bytes, indicating current height)
+| Byte 0 | Byte 1 | Byte 2 | Byte 3 | Byte 4   | Byte 5   |
+| ------ | ------ | ------ | ------ | -------- | -------- |
+| 0x98   | 0x98   | 0x00   | 0x00   | (height) | (height) |
+
+Height can be a value between *0x4B* and *0x7B*
 
 
 
@@ -100,6 +104,30 @@ Last 2 Bytes of Message: 0x7B, 0x7B
 
 ## Transmitted Data
 
+Base message:
+
+| Byte 0 | Byte 1 | Byte 2 | Byte 3   | Byte 4   |
+| ------ | ------ | ------ | -------- | -------- |
+| 0xD8   | 0xD8   | 0x66   | (button) | (button) |
+
+Button values:
+
+:arrow_down: 0x01 (0b0000_0001)
+
+:arrow_up: 0x02 (0b0000_0010)
+
+:one: 0x04 (0b0000_0100)
+
+:two: 0x08 (0b0000_1000)
+
+:three: 0x10 (0b0001_0000)
+
+:four: 0x20 (0b0010_0000)
+
+:m: 0x40 (0b0100_0000)
+
+
+
 ### Pressing up
 
 0xD8, 0xD8, 0x66, 0x00, 0x00
@@ -138,7 +166,7 @@ Last 2 Bytes of Message: 0x7B, 0x7B
 
 0xD8, 0xD8, 0x66, 0x10, 0x10
 
-(repeating 0x10 as long as the button is pressed)
+(keep going with end 0x10 as long as the button is pressed)
 
 ### Pressing 4
 
@@ -146,7 +174,7 @@ Last 2 Bytes of Message: 0x7B, 0x7B
 
 0xD8, 0xD8, 0x66, 0x00, 0x20
 
-(repeating 0x20 as long as the button is pressed)
+(keep going with end 0x20 as long as the button is pressed)
 
 ### Pressing M
 
@@ -154,17 +182,15 @@ Last 2 Bytes of Message: 0x7B, 0x7B
 
 0xD8, 0xD8, 0x66, 0x40, 0x40
 
-0xD8, 0xD8, 0x66, 0x40, 0x40
-
-(repeating 0x40 as long as the button is pressed)
+(keep going with end 0x40 as long as the button is pressed)
 
 ## Analyzing the protocol
 
-- Controller->Desk: Every message contains 5x2 bytes
+- Controller->Desk: Every message contains 5 bytes
 - Controller->Desk: Message always starts with 0xD8, 0xD8, 0x66
 - Controller->Desk: Last 2 Bytes always repeat
-- Desk->Controller: Every message contains ... bytes
-- Desk->Controller always starts with ...
+- Desk->Controller: Every message contains 6 bytes
+- Desk->Controller always starts with 0x98, 0x98, 0x00, 0x00
 - Every button corresponds to 1 bit in the message
 
   - 7 buttons, 8 bit -> highest bit unused (?)
