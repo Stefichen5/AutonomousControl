@@ -11,6 +11,12 @@ I bought a standing desk from Autonomous (Smart Desk 2 Home Office). After setti
 - More detailed writeup
 - Finish implementing protocol on ESP32 (possibly with wifi control, "full system" in the future?)
 
+## Already done
+
+- Written overview of the protocol
+- Implement most of the needed commands
+  - controller can move the desk up, down, go to preset, and get current height
+
 ## First impressions
 
 Opening up the controller reveals nicely labeled PINs.
@@ -27,11 +33,11 @@ Thus we now only know that UART is used to transfer data, but also which wire ca
 | yellow | RX       |
 | blue   | 5V       |
 
-After some trying out, I found the baudrate: 9600
+After some trying out, I found the **baudrate: 9600**
 
 Height-Profiles are not saved on this controller - they are stored in the desk.
 
-The controller board uses a STC12C5612AD controller. It features:
+The controller board uses a STC12C5612AD uC. It features:
 
 - 3,5-5,5V
 - 8 Bit
@@ -48,13 +54,17 @@ I used a DSView Logic Analyzer which I bought here [from Banggood](https://www.b
 
 I did not dismantle the controller that shipped with my desk. Instead, I asked the customer support for a spare one / replacement. They shipped it to me for 27€.
 
-I opened up the casing (standard screws) and found a nicely labeled PCB where I could attach the probes to. 
+I opened up the casing (standard screws) and found a nicely labeled PCB where I could attach the probes to. Later I desoldered the board from the cable so I could connect my ESP32 with the cable.
 
 You can find my captured data from the logic analyzer in the folder "logic_analyzer".
 
-## My controller implementation
+## Using my controller implementation
 
 **_If you are only interested in reading about the protocol, skip this part and scroll down._**
+
+This is **_not_** an Arduino library. This is C++ based on the ESP IDF.
+
+
 
 The general setup is easy. You need to include these two header files:
 
@@ -242,14 +252,15 @@ Button values:
 
 - Controller->Desk: Every message contains 5 bytes
 - Controller->Desk: Message always starts with 0xD8, 0xD8, 0x66
-- Controller->Desk: Last 2 Bytes always repeat
+- Controller->Desk: First and last 2 bytes always repeat
 - Desk->Controller: Every message contains 6 bytes
-- Desk->Controller always starts with 0x98, 0x98, 0x00, 0x00
+- Desk->Controller: Message always starts with 0x98, 0x98, 0x00, 0x00
+- Desk->Controller: all bytes repeat (1st byte = 2nd byte, 3rd = 4th, 5th = 6th)
 - Every button corresponds to 1 bit in the message
 
   - 7 buttons, 8 bit -> highest bit unused (?)
 - The controller sends the current state of the buttons after receiving a message from the desk
-- The controller seems to only move as long as it is receiving data (0x00 as button-data seems to be enough)
+- The motor controller seems to only move the desk as long as it is receiving data (0x00 as button-data seems to be enough)
 - Messages are sent every ~50ms
 
 ![Screenshot DSView](ScreenshotDSView.png)
