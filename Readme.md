@@ -61,8 +61,11 @@ Base Message:
 | Byte 0 | Byte 1 | Byte 2 | Byte 3 | Byte 4   | Byte 5   |
 | ------ | ------ | ------ | ------ | -------- | -------- |
 | 0x98   | 0x98   | 0x00   | 0x00   | (height) | (height) |
+| 0x98   | 0x98   | 0x03   | 0x03   | (height) | (height) |
 
 Height can be a value between *0x4B* and *0x7B*
+
+I am not really sure about the meaning of 0x03 as byte 2+3. I have mostly seen 0x00, but sometimes also 0x03.
 
 
 
@@ -196,5 +199,6 @@ Button values:
   - 7 buttons, 8 bit -> highest bit unused (?)
 - The controller sends the current state of the buttons after receiving a message from the desk
 - The controller seems to only move as long as it is receiving data (0x00 as button-data seems to be enough)
+- Messages are sent every ~50ms
 
 
