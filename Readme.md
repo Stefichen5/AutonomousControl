@@ -9,7 +9,7 @@ I bought a standing desk from Autonomous (Smart Desk 2 Home Office). After setti
 ## ToDo
 
 - More detailed writeup
-- Finish implementing protocol on ESP32 (possibly with wifi control in the future?)
+- Finish implementing protocol on ESP32 (possibly with wifi control, "full system" in the future?)
 
 ## First impressions
 
@@ -52,7 +52,58 @@ I opened up the casing (standard screws) and found a nicely labeled PCB where I 
 
 You can find my captured data from the logic analyzer in the folder "logic_analyzer".
 
-## Received Data
+## My controller implementation
+
+**_If you are only interested in reading about the protocol, skip this part and scroll down._**
+
+The general setup is easy. You need to include these two header files:
+
+```cpp
+#include "hw_interface/uart_device.h"
+#include "app/autonomous_controller.h"
+```
+
+Now you can prepare the controller:
+
+```cpp
+//create an object that handles the uart connection
+//we use UART_NUM_2 and the pins 23 + 22
+uart_device uart(UART_NUM_2, 9600, 23, 22);
+
+//create an autonomous controller (it needs the uart handler)
+//if the uart is configured differently, the construcor
+//will automatically set baudrate, data and stop bits
+autonomous_controller controller(&uart);
+```
+
+You are all good to go. Now you can move your desk up and down (provided you have all the wires hooked up correctly). Some examples:
+
+```cpp
+![Screenshot DSView](/home/stefan/Dokumente/Autonomous/Screenshot DSView.png)#move the desk to the height value 0x4D
+#note: I might add a conversion in the future so you can
+#use logical units such as cm
+controller.go_to_height(0x4D);
+
+#the same as when you press the button "1"
+#	->move to the saved preset height
+controller.go_to_preset(controller.button_1);
+
+#pretend you are pressing buttons 1 and 2 simultaniously
+#I don't know why you might want to do that...
+controller.send_button(controller.button_1 | controller.button_2);
+
+#move the table down 1 step
+#you can use both commands - they do the same
+controller.go_down();
+controller.send_button(controller.button_down);
+
+#...
+#please have a look at the file autonomous_controller.h for more details
+```
+
+## Protocol
+
+### Received Data
 
 When no button is pressed, we keep receiving (repeating):
 
@@ -105,7 +156,7 @@ Height: 48.40
 
 Last 2 Bytes of Message: 0x7B, 0x7B
 
-## Transmitted Data
+### Transmitted Data
 
 Base message:
 
@@ -131,7 +182,7 @@ Button values:
 
 
 
-### Pressing up
+#### Pressing up
 
 0xD8, 0xD8, 0x66, 0x00, 0x00
 
@@ -139,7 +190,7 @@ Button values:
 
 (keep going with end 0x02 as long as the button is pressed)
 
-### Pressing Down
+#### Pressing Down
 
 0xD8, 0xD8, 0x66, 0x00, 0x00
 
@@ -147,7 +198,7 @@ Button values:
 
 (keep going with end 0x01 as long as the button is pressed)
 
-### Pressing 1
+#### Pressing 1
 
 0xD8, 0xD8, 0x66, 0x00, 0x00
 
@@ -155,7 +206,7 @@ Button values:
 
 (keep going with end 0x04 as long as the button is pressed)
 
-### Pressing 2
+#### Pressing 2
 
 0xD8, 0xD8, 0x66, 0x00, 0x00
 
@@ -163,7 +214,7 @@ Button values:
 
 (keep going with end 0x08 as long as the button is pressed)
 
-### Pressing 3
+#### Pressing 3
 
 0xD8, 0xD8, 0x66, 0x00, 0x00
 
@@ -171,7 +222,7 @@ Button values:
 
 (keep going with end 0x10 as long as the button is pressed)
 
-### Pressing 4
+#### Pressing 4
 
 0xD8, 0xD8, 0x66, 0x00, 0x00
 
@@ -179,7 +230,7 @@ Button values:
 
 (keep going with end 0x20 as long as the button is pressed)
 
-### Pressing M
+#### Pressing M
 
 0xD8, 0xD8, 0x66, 0x00, 0x00
 
@@ -187,7 +238,7 @@ Button values:
 
 (keep going with end 0x40 as long as the button is pressed)
 
-## Analyzing the protocol
+### Analyzing the protocol
 
 - Controller->Desk: Every message contains 5 bytes
 - Controller->Desk: Message always starts with 0xD8, 0xD8, 0x66
@@ -201,4 +252,4 @@ Button values:
 - The controller seems to only move as long as it is receiving data (0x00 as button-data seems to be enough)
 - Messages are sent every ~50ms
 
-
+![Screenshot DSView](Screenshot DSView.png)
