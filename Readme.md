@@ -169,5 +169,6 @@ Last 2 Bytes of Message: 0x7B, 0x7B
 
   - 7 buttons, 8 bit -> highest bit unused (?)
 - The controller sends the current state of the buttons after receiving a message from the desk
+- The controller seems to only move as long as it is receiving data (0x00 as button-data seems to be enough)
 
 

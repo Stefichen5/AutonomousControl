@@ -9,14 +9,18 @@ extern "C" void app_main(void)
 	uart_device uart(UART_NUM_2, 9600, 23, 22);
 	autonomous_controller controller(&uart);
 
-	__uint8_t data[5] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE};
-
-	//std::cout << uart.read_data(data, 5, 1000 / portTICK_RATE_MS) << std::endl;
-
-	//uart.send_data((char*)&data[0], 5);
+	controller.get_height();
+	controller.send_button(0);
+	vTaskDelay(50 / portTICK_PERIOD_MS);
+	controller.send_button(controller.button_2);
+	vTaskDelay(50 / portTICK_PERIOD_MS);
 
 	while (1){
-		fprintf(stdout, "height: %i\n",controller.get_height());
-		vTaskDelay(2000 / portTICK_PERIOD_MS);
+		controller.send_button(0);
+		vTaskDelay(50 / portTICK_PERIOD_MS);
+		//fprintf(stdout, "height: %i\n",controller.get_height());
+		//controller.get_height();
+		//controller.send_button(controller.button_up);
+		//vTaskDelay(2000 / portTICK_PERIOD_MS);
 	}
 }

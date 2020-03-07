@@ -84,3 +84,45 @@ __uint8_t autonomous_controller::get_height() {
 	if (height_raw == 0) { return height_raw;}
 	return height_raw-height_min + 1;
 }
+
+bool autonomous_controller::send_button(__uint8_t button_combination) {
+	__uint8_t msg[SND_MSG_LEN] = {0};
+
+	fill_send_message_template(msg, button_combination);
+
+	return send_message(msg);
+}
+
+void autonomous_controller::fill_send_message_template(__uint8_t *buf, t_button buttons) {
+	if (buf == nullptr) {return;}
+
+	buf[0] = snd_header_first;
+	buf[1] = snd_header_first;
+	buf[2] = snd_header_second;
+	buf[3] = buttons;
+	buf[4] = buttons;
+}
+
+bool autonomous_controller::send_message(__uint8_t *msg) {
+	bool response = device->send_data((char*)msg, SND_MSG_LEN);
+
+	return response;
+}
+
+bool autonomous_controller::go_up() {
+	return send_button(button_up);
+}
+
+bool autonomous_controller::go_down() {
+	return send_button(button_down);
+}
+
+bool autonomous_controller::go_to_preset(autonomous_controller::t_button preset) {
+	if (preset != button_1 && preset != button_2 && preset != button_3 && preset != button_4){
+		std::cout << "invalid button" << std::endl;
+		return false;
+	}
+	//todo: need logic to keep sending something until desired height reached
+	// (compare last 2-3 height measurements - if no change -> reached)
+	return false;
+}
