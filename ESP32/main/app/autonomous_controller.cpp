@@ -20,7 +20,7 @@ __uint8_t autonomous_controller::get_height_raw() {
 
 	//discard all data read before, we don't need it
 	device->flush();
-	int read_bytes = device->read_data(buf, 12, 80 / portTICK_PERIOD_MS);
+	device->read_data(buf, 12, 80 / portTICK_PERIOD_MS);
 
 	return get_height_from_buffer(buf, 12);
 }
@@ -71,7 +71,8 @@ bool autonomous_controller::is_valid_receive_header_second_stage(__uint8_t *firs
 
 	//first and second byte need to be the same
 	//and they have to be 0x00
-	return (*first_byte == rec_header_second) && (*first_byte == *(first_byte+1));
+	return ((*first_byte == rec_header_second) || (*first_byte == rec_header_second_alt))
+			&& (*first_byte == *(first_byte+1));
 }
 
 bool autonomous_controller::is_height_value_in_boundaries(__uint8_t val) const {
@@ -122,7 +123,75 @@ bool autonomous_controller::go_to_preset(autonomous_controller::t_button preset)
 		std::cout << "invalid button" << std::endl;
 		return false;
 	}
-	//todo: need logic to keep sending something until desired height reached
-	// (compare last 2-3 height measurements - if no change -> reached)
-	return false;
+
+	//prepare height message
+	__uint8_t msg[SND_MSG_LEN] = {0};
+	fill_send_message_template(msg, preset);
+
+	//send empty message to start
+	send_message((__uint8_t*)snd_msg_empty);
+
+	bool done = false;
+	__uint8_t last_height = 0;
+	__uint8_t same_height_ctr = 0;
+
+	//loop until height reached
+	while (!done){
+		vTaskDelay(50 / portTICK_PERIOD_MS);
+		__uint8_t cur_height = get_height_raw();
+		send_message(msg);
+		//if  height does not change X times, we assume that we reached our final height
+		if (cur_height == last_height){
+			same_height_ctr++;
+
+			if (same_height_ctr >= height_done_threshold){
+				done = true;
+			}
+		} else{
+			//height changed, start counting again
+			last_height = cur_height;
+			same_height_ctr = 0;
+		}
+	}
+
+	return true;
+}
+
+bool autonomous_controller::go_to_height(__uint8_t height) {
+	if (height < height_min || height > height_max){
+		std::cout << "invalid height" << (__uint32_t)height << "given. has to be between"
+		<< (__uint32_t)height_min << " and " << (__uint32_t)height_max << std::endl;
+		return false;
+	}
+
+	__uint8_t current_height = 0;
+
+	send_message((uint8_t*)snd_msg_empty);
+
+	while (current_height != height){
+		__uint8_t invalid_ctr = 0;
+
+		vTaskDelay(50 / portTICK_PERIOD_MS);
+		current_height = get_height_raw();
+
+		fprintf(stdout, "0x%x\n", current_height);
+
+		if (current_height == 0) {
+			//invalid reading
+			invalid_ctr++;
+
+			//assume some error happened. don't stay in this loop forever
+			if(invalid_ctr > 10){
+				return false;
+			}
+
+			continue;
+		} else if (current_height < height){
+			go_up();
+		} else if (current_height > height) {
+			go_down();
+		}
+	}
+
+	return true;
 }

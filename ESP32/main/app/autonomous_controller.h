@@ -29,7 +29,7 @@ public:
 
 	/**
 	 * @brief go to a specific height step
-	 * @param height
+	 * @param height (raw value - 0x4B-0x7B
 	 * @return success
 	 */
 	bool go_to_height(__uint8_t height);
@@ -83,9 +83,12 @@ private:
 
 	__uint8_t const rec_header_first = 0x98;
 	__uint8_t const rec_header_second = 0x00;
+	__uint8_t const rec_header_second_alt = 0x03;
 
 	__uint8_t const snd_header_first = 0xD8;
 	__uint8_t const snd_header_second = 0x66;
+
+	__uint8_t const height_done_threshold = 50;
 
 	#define REC_MSG_LEN 6
 	#define SND_MSG_LEN 5
