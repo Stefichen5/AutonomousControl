@@ -79,7 +79,7 @@ autonomous_controller controller(&uart);
 You are all good to go. Now you can move your desk up and down (provided you have all the wires hooked up correctly). Some examples:
 
 ```cpp
-![Screenshot DSView](/home/stefan/Dokumente/Autonomous/Screenshot DSView.png)#move the desk to the height value 0x4D
+#move the desk to the height value 0x4D
 #note: I might add a conversion in the future so you can
 #use logical units such as cm
 controller.go_to_height(0x4D);
