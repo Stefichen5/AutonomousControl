@@ -132,19 +132,19 @@ I am not really sure about the meaning of 0x03 as byte 2+3. I have mostly seen 0
 
 Height indication:
 
-Height: 29.05
+Height: 29.5
 
 Last 2 Bytes of Message: 0x4B, 0x4B
 
 
 
-Height: 29.09
+Height: 29.9
 
 Last 2 Bytes of Message: 0x4C, 0x4C
 
 
 
-Height: 30.03
+Height: 30.3
 
 Last 2 Bytes of Message: 0x4D, 0x4D
 
@@ -156,13 +156,13 @@ Message keeps increasing by 1
 
 
 
-Height: 48.00
+Height: 48.0
 
 Last 2 Bytes of Message: 0x7A, 0x7A
 
 
 
-Height: 48.40
+Height: 48.4
 
 Last 2 Bytes of Message: 0x7B, 0x7B
 
