@@ -29,7 +29,7 @@ gpio_pin::~gpio_pin() {
 	gpio_set_level(pin_nr, off);
 }
 
-bool gpio_pin::set_mode(gpio_mode_t const mode) {
+bool gpio_pin::set_direction(gpio_mode_t const mode) {
 	auto retval = gpio_set_direction(pin_nr, mode);
 
 	return retval == ESP_OK;
@@ -37,4 +37,15 @@ bool gpio_pin::set_mode(gpio_mode_t const mode) {
 
 gpio_num_t gpio_pin::get_nr() const {
 	return pin_nr;
+}
+
+bool gpio_pin::enable_pullup(bool enable) {
+	esp_err_t ret = ESP_OK;
+
+	if(enable){
+		ret = gpio_pullup_en(pin_nr);
+	} else{
+		ret = gpio_pullup_dis(pin_nr);
+	}
+	return ret == ESP_OK;
 }

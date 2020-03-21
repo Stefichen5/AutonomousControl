@@ -22,7 +22,9 @@ public:
 	gpio_pin_state get_state() const;
 	bool set_state(gpio_pin_state const state);
 
-	bool set_mode(gpio_mode_t const mode);
+	bool set_direction(gpio_mode_t const mode);
+
+	bool enable_pullup(bool enable);
 
 	gpio_num_t get_nr() const;
 
