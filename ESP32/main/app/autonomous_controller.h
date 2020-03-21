@@ -62,6 +62,18 @@ public:
 	__uint8_t get_height_raw();
 
 	/**
+	 * @brief get current height in inches
+	 * @return height (inches)
+	 */
+	float get_height_inch();
+
+	/**
+	 * @brief get current height in cm
+	 * @return height (cm)
+	 */
+	float get_height_cm();
+
+	/**
 	 * @brief get current height
 	 * @return height (in steps, 1 is lowest)
 	 */
@@ -89,6 +101,11 @@ private:
 	__uint8_t const snd_header_second = 0x66;
 
 	__uint8_t const height_done_threshold = 50;
+
+	//minimum height: 29.5"
+	const float base_height = 29.5f;
+	//1 step up = 0.4"
+	const float step_size = 0.4;
 
 	#define REC_MSG_LEN 6
 	#define SND_MSG_LEN 5

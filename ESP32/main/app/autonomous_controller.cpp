@@ -174,8 +174,6 @@ bool autonomous_controller::go_to_height(__uint8_t height) {
 		vTaskDelay(50 / portTICK_PERIOD_MS);
 		current_height = get_height_raw();
 
-		fprintf(stdout, "0x%x\n", current_height);
-
 		if (current_height == 0) {
 			//invalid reading
 			invalid_ctr++;
@@ -194,4 +192,22 @@ bool autonomous_controller::go_to_height(__uint8_t height) {
 	}
 
 	return true;
+}
+
+float autonomous_controller::get_height_inch() {
+	float height = 0.0;
+
+	//1 = 29.5"
+	//2 = 29.9"
+	//3 = 30.3"
+	//....
+	__uint8_t height_step = get_height();
+
+	height = base_height + (step_size * (height_step - 1));
+
+	return height;
+}
+
+float autonomous_controller::get_height_cm() {
+	return get_height_inch() * 2.54f;
 }
