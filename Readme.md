@@ -56,6 +56,8 @@ I did not dismantle the controller that shipped with my desk. Instead, I asked t
 
 I opened up the casing (standard screws) and found a nicely labeled PCB where I could attach the probes to. Later I desoldered the board from the cable so I could connect my ESP32 with the cable.
 
+I never tried running the ESP32 in parallel to the original controller. There might be interference since the used communication setup is not a bus system and not designed for multiple masters/slaves.
+
 You can find my captured data from the logic analyzer in the folder "logic_analyzer".
 
 ## Using my controller implementation
